@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simulated Annealing TSP</title>
+    <!-- Agrega el enlace a Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            text-align: center; /* Centra el contenido en el contenedor */
+        }
+        #generarRuta {
+            background-color: #343a40; /* Cambia el color del botón a dark */
+            border-color: #343a40; /* Cambia el color del borde del botón a dark */
+            color: white; /* Establece el color del texto en blanco */
+        }
+        .result-card {
+            background-color: #343a40; /* Establece el color del card igual al del botón */
+            border-color: #343a40; /* Establece el color del borde del card igual al del botón */
+            color: white; /* Establece el color del texto en blanco */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Simulated Annealing TSP</h1>
+        <button id="generarRuta" class="btn btn-primary">Generar Ruta Óptima</button>
+        <div class="mt-4">
+            <input type="text" id="mejorRutaInput" class="form-control" placeholder="Mejor Ruta" readonly>
+            <input type="text" id="distanciaInput" class="form-control mt-2" placeholder="Distancia Total" readonly>
+        </div>
+        <div class="container mt-4">
+            <h1 class="mb-4">Rutas Generadas</h1>
+            <div id="resultadosContainer" class="row"></div> <!-- Agrega una fila para los cards -->
+        </div>
+    </div>
+
+    <script>
+        let resultadoCount = 1; // Variable para llevar un registro de los resultados
+
+        document.getElementById('generarRuta').addEventListener('click', function() {
+            fetch('/generar_ruta', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                let mejorRutaInput = document.getElementById('mejorRutaInput');
+                let distanciaInput = document.getElementById('distanciaInput');
+                let resultadosContainer = document.getElementById('resultadosContainer');
+
+                mejorRutaInput.value = data.mejor_ruta.join(" -> ");
+                distanciaInput.value = data.distancia_total.toFixed(2);
+
+                // Crea una nueva tarjeta (card) para mostrar los resultados con un número secuencial
+                let nuevaTarjeta = document.createElement('div');
+                nuevaTarjeta.classList.add('card', 'result-card', 'col-md-2', 'mb-4', 'mr-4');  // Cada card ocupará 3 de 12 columnas
+                nuevaTarjeta.innerHTML = `
+                    <div class="card-body">
+                        <h5 class="card-title">Resultado ${resultadoCount}</h5>
+                        <p class="card-text">Mejor Ruta: ${data.mejor_ruta.join(" , ")}</p>
+                        <p class="card-text">Distancia Total: ${data.distancia_total.toFixed(2)} unidades</p>
+                    </div>
+                `;
+                resultadosContainer.appendChild(nuevaTarjeta);
+
+                resultadoCount++; // Incrementa el contador de resultados
+            });
+        });
+    </script>
+</body>
+</html>
